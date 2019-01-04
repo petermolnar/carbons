@@ -125,7 +125,7 @@ static void carbons_xml_stripped_cb(PurpleConnection * gc_p, xmlnode ** stanza_p
 
   if (!(*stanza_pp) || g_strcmp0((*stanza_pp)->name, "message")) {
     return;
-  }  
+  }
 
   carbons_node_p = xmlnode_get_child_with_namespace(*stanza_pp, "sent", CARBONS_XMLNS);
   if (!carbons_node_p) {
@@ -179,10 +179,8 @@ static void carbons_autoenable(PurpleAccount * acc_p) {
 static void carbons_discover_cb(JabberStream * js_p, const char * from,
                                 JabberIqType type,   const char * id,
                                 xmlnode * packet_p,  gpointer data_p) {
-  xmlnode * query_node_p   = (void *) 0;
-  xmlnode * feature_node_p = (void *) 0;
 
-  const char * feature_name = (void *) 0;
+  xmlnode * query_node_p   = (void *) 0;
   const char * accname      = purple_account_get_username(purple_connection_get_account(js_p->gc));
 
   if (type == JABBER_IQ_ERROR) {
@@ -195,17 +193,8 @@ static void carbons_discover_cb(JabberStream * js_p, const char * from,
     purple_debug_error(CARBONS_LOG_CATEGORY, "No 'query' node in feature discovery reply for %s.\n", accname);
     return;
   }
-
-  for (feature_node_p = xmlnode_get_child(query_node_p, "feature"); feature_node_p; feature_node_p = feature_node_p->next) {
-    feature_name = xmlnode_get_attrib(feature_node_p, "var");
-    if (!g_strcmp0(CARBONS_XMLNS, feature_name)) {
-      purple_debug_info(CARBONS_LOG_CATEGORY, "Found carbons in server features, sending enable request for %s.\n", accname);
-      carbons_autoenable(purple_connection_get_account(js_p->gc));
-      return;
-    }
-  }
-
-  purple_debug_info(CARBONS_LOG_CATEGORY, "Server does not support message carbons, therefore doing nothing for %s.\n", accname);
+  purple_debug_info(CARBONS_LOG_CATEGORY, "Trying to enable carbons %s.\n", accname);
+  carbons_autoenable(purple_connection_get_account(js_p->gc));
 }
 
 static void carbons_discover(PurpleAccount * acc_p) {
